@@ -1,0 +1,36 @@
+import requests
+
+def analisar_seguranca(url):
+    # Garante que a URL comece com http/https
+    if not url.startswith('http'):
+        url = 'https://' + url
+
+    try:
+        print(f"\n[+] Analisando: {url}")
+        response = requests.get(url, timeout=10)
+        headers = response.headers
+
+        # Lista de cabeçalhos que vamos procurar
+        security_headers = {
+            "Strict-Transport-Security": "Protege contra ataques de downgrade (HSTS).",
+            "Content-Security-Policy": "Previne XSS e injeção de dados.",
+            "X-Content-Type-Options": "Impede o navegador de interpretar arquivos incorretamente.",
+            "X-Frame-Options": "Protege contra Clickjacking.",
+            "X-XSS-Protection": "Filtro básico contra Cross-Site Scripting."
+        }
+
+        print("-" * 50)
+        for header, descricao in security_headers.items():
+            if header in headers:
+                print(f"[V] {header}: Presente. (OK)")
+            else:
+                print(f"[X] {header}: AUSENTE!")
+                print(f"    Dica: {descricao}")
+        print("-" * 50)
+
+    except requests.exceptions.RequestException as e:
+        print(f"[!] Erro ao conectar: {e}")
+
+if _name_ == "_main_":
+    site = input("Digite a URL do site (ex: google.com): ")
+    analisar_seguranca(site)
